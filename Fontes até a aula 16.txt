@@ -1,0 +1,39 @@
+Public Class frmLogin
+
+    Dim nomeTela As String
+
+
+    Private Sub FrmLogin_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        nomeTela = "Login"
+        MsgBox("Abriu o Formulário", MsgBoxStyle.Information, nomeTela)
+    End Sub
+
+    Private Sub BtnNovo_Click(sender As Object, e As EventArgs) Handles btnNovo.Click
+        MsgBox("Veja o Resultado", MsgBoxStyle.Information, nomeTela)
+        calcular()
+
+    End Sub
+
+
+    Sub calcular()
+        Dim num1 As Integer
+        Dim num2 As Integer
+        Dim total As Integer
+
+        num1 = 2
+        num2 = 4
+        total = num1 + num2
+        MsgBox("O valor da soma de " & num1 & " + " & num2 & " é " & total, MsgBoxStyle.Information, nomeTela)
+
+
+        If total > 5 Then
+            MsgBox("É maior que 5", MsgBoxStyle.Information, nomeTela)
+        Else
+            MsgBox("Não é maior que 5", MsgBoxStyle.Information, nomeTela)
+        End If
+
+    End Sub
+
+
+
+End Class

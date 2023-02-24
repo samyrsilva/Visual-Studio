@@ -1,0 +1,86 @@
+Public Class frmLogin
+    Private Sub FrmLogin_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Desabilitar()
+        lblMensagem.Text = ""
+        'Me.BackColor = Color.FromArgb(54, 108, 19)
+
+    End Sub
+
+    Private Sub BtnNovo_Click(sender As Object, e As EventArgs) Handles btnNovo.Click
+        txtNum1.Enabled = True
+        txtNum2.Enabled = True
+        btnCalcular.Enabled = True
+        Limpar()
+    End Sub
+
+    Private Sub BtnLimpar_Click(sender As Object, e As EventArgs) Handles btnLimpar.Click
+        Limpar()
+    End Sub
+
+
+    Sub Calcular()
+        Dim num1 As Integer
+        Dim num2 As Integer
+        Dim total As Integer
+
+        num1 = txtNum1.Text
+        num2 = txtNum2.Text
+
+        total = num1 + num2
+
+        'MsgBox(total)
+        lblMensagem.Text = "O resultado é " & total
+
+    End Sub
+
+    Private Sub BtnCalcular_Click(sender As Object, e As EventArgs) Handles btnCalcular.Click
+        'CHAMADA DA FUNÇÃO CALCULAR
+
+        Dim numerico1 As Boolean
+        Dim numerico2 As Boolean
+        Dim num1 As String
+        Dim num2 As String
+        num1 = txtNum1.Text
+        num2 = txtNum2.Text
+
+        If num1 <> "" And num2 <> "" Then
+            numerico1 = IsNumeric(num1)
+            numerico2 = IsNumeric(num2)
+            If numerico1 = True And numerico2 = True Then
+                Calcular()
+                Desabilitar()
+            Else
+                'MsgBox("Digite apenas números")
+                lblMensagem.Text = "Digite apenas números"
+                lblMensagem.ForeColor = Color.FromArgb(54, 108, 19)
+                'lblMensagem.ForeColor = Color.DarkRed
+                txtNum1.Focus()
+                txtNum1.Text = ""
+                txtNum2.Text = ""
+            End If
+
+        Else
+            MsgBox("Preecha os campos")
+            txtNum1.Focus()
+        End If
+
+
+    End Sub
+
+
+    Sub Desabilitar()
+        txtNum1.Enabled = False
+        txtNum2.Enabled = False
+        btnCalcular.Enabled = False
+
+    End Sub
+
+
+    Sub Limpar()
+        txtNum1.Text = ""
+        txtNum2.Text = ""
+        lblMensagem.Text = ""
+        txtNum1.Focus()
+    End Sub
+
+End Class
