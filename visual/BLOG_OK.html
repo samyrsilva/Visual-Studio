@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Blog</title>
+</head>
+<body>
+	<h1>Blog</h1>
+
+	<section id="posts">
+		<h2>Postagens</h2>
+		<ul id="lista-postagens">
+		</ul>
+	</section>
+
+	<section id="cadastro">
+		<h2>Nova postagem</h2>
+		<form>
+			<label for="titulo">Título:</label>
+			<input type="text" id="titulo" name="titulo" required><br>
+			<label for="conteudo">Conteúdo:</label><br>
+			<textarea id="conteudo" name="conteudo" rows="5" cols="50" required></textarea><br>
+			<button type="submit">Cadastrar</button>
+		</form>
+	</section>
+
+	<section id="login">
+		<h2>Login</h2>
+		<form>
+			<label for="email">E-mail:</label>
+			<input type="email" id="email" name="email" required><br>
+			<label for="senha">Senha:</label>
+			<input type="password" id="senha" name="senha" required><br>
+			<button type="submit">Entrar</button>
+		</form>
+	</section>
+
+	<script>
+		let postagens = [];
+
+		function exibirPostagens() {
+			// Limpa a lista de postagens
+			const listaPostagens = document.querySelector("#lista-postagens");
+			listaPostagens.innerHTML = "";
+			// Adiciona cada postagem à lista
+			postagens.forEach((postagem) => {
+				const li = document.createElement("li");
+				li.innerHTML = `
+					<h3>${postagem.titulo}</h3>
+					<p>${postagem.conteudo}</p>
+					<p>Autor: ${postagem.autor}</p>
+				`;
+				if (postagem.autor === sessionStorage.getItem("email")) {
+					const botaoEditar = document.createElement("button");
+					botaoEditar.innerText = "Editar";
+					botaoEditar.addEventListener("click", () => editarPostagem(postagem));
+					li.appendChild(botaoEditar);
+					const botaoDeletar = document.createElement("button");
+					botaoDeletar.innerText = "Deletar";
+					botaoDeletar.addEventListener("click", () => deletarPostagem(postagem));
+					li.appendChild(botaoDeletar);
+				}
+				listaPostagens.appendChild(li);
+			});
+		}
+
+		function cadastrarPostagem(evento) {
+			evento.preventDefault();
+			const formulario = evento.target;
+			const titulo = formulario.titulo.value;
+			const conteudo = formulario.conteudo.value;
+			const autor = sessionStorage.getItem("email");
+			postagens.push({ titulo, conteudo, autor });
+			exibirPostagens();
+			formulario.reset();
+		}
+
+		function editarPostagem(postagem) {
+			const novoTitulo = prompt("Digite o novo título:", postagem.titulo);
+			const novoConteudo = prompt("Digite o novo conteúdo:", postagem.conteudo);
+			if (novoTitulo && novoConteudo) {
+				postagem.titulo = novoTitulo;
+				postagem.conteudo = novoConteudo;
+				exibirPostagens();
+			}
+		}
+
+		function deletarPostagem(postagem) {
+			const confirmacao = confirm(`Tem certeza que deseja deletar a postagem "${postagem.titulo}"?`);
+if (confirmacao) {
+const indice = postagens.indexOf(postagem);
+postagens.splice(indice, 1);
+exibirPostagens();
+}
+}
+function fazerLogin(evento) {
+		evento.preventDefault();
+		const formulario = evento.target;
+		const email = formulario.email.value;
+		const senha = formulario.senha.value;
+		if (email === "usuario1@gmail.com" && senha === "123456") {
+			sessionStorage.setItem("email", email);
+			formulario.reset();
+			document.querySelector("#cadastro").style.display = "block";
+			document.querySelector("#login").style.display = "none";
+		} else if (email === "usuario2@gmail.com" && senha === "abcdef") {
+			sessionStorage.setItem("email", email);
+			formulario.reset();
+			document.querySelector("#cadastro").style.display = "none";
+			document.querySelector("#login").style.display = "none";
+		} else {
+			alert("E-mail ou senha inválidos!");
+		}
+	}
+
+	// Eventos
+	document.querySelector("form#cadastro").addEventListener("submit", cadastrarPostagem);
+	document.querySelector("form#login").addEventListener("submit", fazerLogin);
+
+	// Exemplo de postagens
+	postagens.push({ titulo: "Primeira postagem", conteudo: "Este é o conteúdo da primeira postagem", autor: "usuario1@gmail.com" });
+	postagens.push({ titulo: "Segunda postagem", conteudo: "Este é o conteúdo da segunda postagem", autor: "usuario2@gmail.com" });
+
+	// Exibe as postagens iniciais
+	exibirPostagens();
+</script>

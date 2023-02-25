@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+	<head>
+		<meta charset="UTF-8">
+		<title>Meu Blog</title>
+		<link rel="stylesheet" href="style.css">
+	</head>
+	<body>
+		<header>
+			<h1>Meu Blog</h1>
+		</header>
+		<main>
+			<section id="lista-postagens"></section>
+			<button id="botao-nova-postagem">Nova Postagem</button>
+			<form id="form-nova-postagem">
+				<label>Título:</label>
+				<input type="text" name="titulo" required>
+				<label>Conteúdo:</label>
+				<textarea name="conteudo" rows="5" required></textarea>
+				<button type="submit">Publicar</button>
+			</form>
+			<form id="form-login">
+				<label>E-mail:</label>
+				<input type="email" name="email" required>
+				<label>Senha:</label>
+				<input type="password" name="senha" required>
+				<button type="submit">Entrar</button>
+			</form>
+		</main>
+		<nav>
+			<a href="#" id="link-lista-postagens">Postagens</a>
+			<a href="#" id="link-login">Entrar</a>
+		</nav>
+		<script>
+			const listaPostagens = document.getElementById('lista-postagens');
+			const botaoNovaPostagem = document.getElementById('botao-nova-postagem');
+			const formNovaPostagem = document.getElementById('form-nova-postagem');
+			const formLogin = document.getElementById('form-login');
+			const linkListaPostagens = document.getElementById('link-lista-postagens');
+			const linkLogin = document.getElementById('link-login');
+
+			// Mostra a lista de postagens e esconde o formulário de nova postagem
+			function mostrarListaPostagens() {
+				listaPostagens.style.display = 'block';
+				formNovaPostagem.style.display = 'none';
+				linkListaPostagens.classList.add('ativo');
+				linkLogin.classList.remove('ativo');
+			}
+
+			// Mostra o formulário de nova postagem e esconde a lista de postagens
+			function mostrarFormNovaPostagem() {
+				formNovaPostagem.style.display = 'block';
+				listaPostagens.style.display = 'none';
+				linkListaPostagens.classList.remove('ativo');
+				linkLogin.classList.remove('ativo');
+			}
+
+			// Mostra o formulário de login e esconde a lista de postagens
+			function mostrarFormLogin() {
+				formLogin.style.display = 'block';
+				listaPostagens.style.display = 'none';
+				linkListaPostagens.classList.remove('ativo');
+				linkLogin.classList.add('ativo');
+			}
+
+			// Adiciona uma nova postagem na lista de postagens
+			function adicionarPostagem(postagem) {
+				const section = document.createElement('section');
+				const titulo = document.createElement('h2');
+				const conteudo = document.createElement('p');
+				const autor = document.createElement('p');
+				titulo.innerText = postagem.titulo;
+				conteudo.innerText = postagem.conteudo;
+				autor.innerText = 'Autor: ' + postagem.autor;
+				section.appendChild(titulo);
+				section.appendChild(conteudo);
+				section.appendChild(autor);
+				listaPostagens.appendChild(section);
+			}
+
+			// Busca todas as postagens do servidor e adiciona na lista de postagens
+function carregarPostagens() {
+fetch('https://meu-blog-api.herokuapp.com/postagens')
+.then(response => response.json())
+.then(postagens => {
+listaPostagens.innerHTML = '';
+postagens.forEach(postagem => {
+adicionarPostagem(postagem);
+});
+});
+}
+		// Cadastra uma nova postagem no servidor e adiciona na lista de postagens
+		function cadastrarPostagem(postagem) {
+			fetch('https://meu-blog-api.herokuapp.com/postagens', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(postagem)
+			})
+				.then(response => response.json())
+				.then(postagem => {
+					adicionarPostagem(postagem);
+					mostrarListaPostagens();
+				});
+		}
+
+		// Verifica se o usuário está logado
+		function verificarLogin() {
+			const token = sessionStorage.getItem('token');
+			if (token) {
+				linkLogin.innerText = 'Sair';
+				linkLogin.onclick = () => {
+					sessionStorage.removeItem('token');
+					location.reload();
+				};
+				mostrarListaPostagens();
+			} else {
+				linkLogin.innerText = 'Entrar';
+				linkLogin.onclick = mostrarFormLogin;
+				mostrarListaPostagens();
+			}
+		}
+
+		// Efetua o login do usuário e armazena o token na sessão
+		function efetuarLogin(email, senha) {
+			fetch('https://meu-blog-api.herokuapp.com/login', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ email, senha })
+			})
+				.then(response => response.json())
+				.then(data => {
+					if (data.token) {
+						sessionStorage.setItem('token', data.token);
+						location.reload();
+					} else {
+						alert('E-mail ou senha inválidos');
+					}
+				});
+		}
+
+		// Verifica se o usuário está logado e define os eventos dos botões e links
+		function configurarPagina() {
+			verificarLogin();
+			botaoNovaPostagem.onclick = mostrarFormNovaPostagem;
+			formNovaPostagem.onsubmit = event => {
+				event.preventDefault();
+				const titulo = formNovaPostagem.elements.titulo.value;
+				const conteudo = formNovaPostagem.elements.conteudo.value;
+				const autor = sessionStorage.getItem('email');
+				cadastrarPostagem({ titulo, conteudo, autor });
+				formNovaPostagem.reset();
+			};
+			formLogin.onsubmit = event => {
+				event.preventDefault();
+				const email = formLogin.elements.email.value;
+				const senha = formLogin.elements.senha.value;
+				efetuarLogin(email, senha);
+				formLogin.reset();
+			};
+		}
+
+		configurarPagina();
+		carregarPostagens();
+	</script>
+</body>
