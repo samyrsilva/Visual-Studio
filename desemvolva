@@ -1,0 +1,9 @@
+Por favor desemvolvar uma aplicação web em codigo python de sistema com base de dados lotal  com a seguintes funcionalidades 01 - Funções do painel de senha:
+
+Geração de senhas para atendimento;
+Organização da fila de atendimento;
+Registro dos dados de cada atendimento;
+Chamada da próxima senha a ser atendida;
+Visualização da senha atual, próxima e anterior na tela de chamada.
+02 - Funcionalidades:
+O painel de senha tem como principal objetivo gerenciar a fila de atendimento e tornar o processo mais organizado e eficiente. O sistema gera senhas para os clientes e registra os dados de cada atendimento, como tipo, opção, data, hora, duração e log. Além disso, a tela de chamada mostra a senha atual, a próxima senha a ser atendida e a senha anterior para melhor controle da fila.
