@@ -1,0 +1,39 @@
+Descrição do painel de senha
+
+Projeto de desenvolvimento de  painel de senha
+
+01 - descrever funções
+ 
+02 - funcionalidades
+A principal função do sistema e gera controle e senha de fila de atendimento 
+para organização de recepção  para os serviços 
+
+03 - linguagem 	
+ Python ou html  ou php , 
+04 - ambiente de desenvolvimento. 
+visual ou python
+05 - acessos controle e segurança 👍
+	o sistema deve usar rede local com via porta do ambiente windows com segurança no código na sua compilação .
+
+06 - Tipo de chamada sequência- opções 
+06-1 prioritária ou normal
+06-2 grupos 
+	A atendimento 0 - recepção autorização
+	B atendimento 1 - recepção - operadora - ouvidoria - reclamação
+	c atendimento 2 - recepção - operadora - Boletos - Carteira - Extrato - IR
+	d Aps - agendamento - Consulta - apresenta exames.
+
+Base dados - local web . my sql - arquivo tex local 
+campos : tipo ,opção , data , hora , duração , log.
+
+
+usa porta cliente e serv escuta e saida de rede. 
+
+Tela  de chamada - 
+	MOSTRA >senha atual  chamada Grande		
+		    > Próxima senha  Media
+	                > Senha anterior  Pequeno
+ 
+ 
+ Exemplo 
+//
