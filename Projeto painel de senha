@@ -1,0 +1,26 @@
+01 - Funções do painel de senha:
+
+Geração de senhas para atendimento;
+Organização da fila de atendimento;
+Registro dos dados de cada atendimento;
+Chamada da próxima senha a ser atendida;
+Visualização da senha atual, próxima e anterior na tela de chamada.
+02 - Funcionalidades:
+O painel de senha tem como principal objetivo gerenciar a fila de atendimento e tornar o processo mais organizado e eficiente. O sistema gera senhas para os clientes e registra os dados de cada atendimento, como tipo, opção, data, hora, duração e log. Além disso, a tela de chamada mostra a senha atual, a próxima senha a ser atendida e a senha anterior para melhor controle da fila.
+
+03 - Linguagem:
+O painel de senha pode ser desenvolvido em Python, HTML ou PHP.
+
+04 - Ambiente de desenvolvimento:
+O ambiente de desenvolvimento pode ser o Visual Studio ou o Python IDE, dependendo da linguagem escolhida para o desenvolvimento.
+
+05 - Acesso, controle e segurança:
+O sistema deve ser implementado em rede local, utilizando a porta do ambiente Windows para garantir a segurança do código na compilação. O acesso ao sistema deve ser controlado e garantir a segurança dos dados dos clientes.
+
+06 - Tipo de chamada sequência- opções:
+O sistema pode ter diferentes opções de chamada, como prioritária ou normal, e também pode ser organizado em grupos, como atendimento 0 - recepção autorização, atendimento 1 - recepção - operadora - ouvidoria - reclamação, atendimento 2 - recepção - operadora - Boletos - Carteira - Extrato - IR, e Aps - agendamento - Consulta - apresenta exames.
+
+Base de dados:
+O painel de senha pode utilizar o MySQL como base de dados, podendo ser local ou web, ou ainda um arquivo texto local. Os campos de registro podem incluir tipo de atendimento, opção selecionada, data, hora, duração e log.
+
+O painel de senha deve utilizar uma porta cliente e servidor para escuta e saída de rede, garantindo a segurança e a eficiência do sistema. A tela de chamada deve mostrar de forma clara e objetiva a senha atual, a próxima senha a ser atendida e a senha anterior, facilitando o controle da fila de atendimento.
