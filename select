@@ -1,0 +1,26 @@
+select count(nome)
+
+select Codigo, Nome from Funcion where Nome like‘J%’
+
+select Codigo, Nome from Funcion where Nome = ‘Tadeu’
+
+select  Coluna, Coluna, ..., Coluna from  Tabela where Condição
+
+select Codigo, Nome from Funcion where Nome <> ‘Tadeu'
+
+select Codigo, Nome from Funcion order by Nome desc
+select Codigo, Nome from Funcion order by Nome
+
+select Codigo, Nome from Funcion where Setor is null 
+>>> Comparativo “is null” (Valor nulo)
+ 
+select count(nome) from Produtos; 
+> 198
+
+select count(nome)
+
+https://www.devmedia.com.br/introducao-ao-comando-select-da-sql/16528#:~:text=O%20comando%20select%20recupera%20os,comandos%20e%20cláusulas%20não%20obrigatórias.
+select count(nome)
+
+select count(1) from Produtos; 
+> 200
