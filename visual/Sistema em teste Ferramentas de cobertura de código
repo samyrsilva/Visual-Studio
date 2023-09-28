@@ -1,0 +1,296 @@
+Usar a cobertura de código para teste de unidade
+Artigo
+02/06/2023
+12 colaboradores
+Neste artigo
+Sistema em teste
+Ferramentas de cobertura de código
+Integrar com o teste do .NET
+Gerar relatórios
+Mostrar mais 2
+ Importante
+
+Este artigo explica a criação do projeto de exemplo. Se você já tem um projeto, pule para a seção Ferramentas de cobertura de código.
+
+Os testes de unidade ajudam a garantir a funcionalidade e são um meio de verificação para as ações de refatoração. A cobertura de código é uma medida da quantidade de código que é executada pelos testes de unidade, ou seja linhas, branches ou métodos. Por exemplo, se você tiver um aplicativo simples com apenas dois branches de código condicionais (branch a e branch b), um teste de unidade que verificar o branch a condicional relatará a cobertura de código do branch como 50%.
+
+Este artigo discute o uso da cobertura de código para testes de unidade com o Coverlet e a geração de relatórios usando o ReportGenerator. Embora este artigo se concentre em C# e no xUnit como a estrutura de teste, tanto o MSTest quanto o NUnit também funcionariam. O Coverlet é um projeto de código aberto no GitHub que fornece uma estrutura de cobertura de código multiplataforma para C#. O Coverlet faz parte do .NET Foundation. O Coverlet coleta dados de execução de teste de cobertura do Cobertura, que são usados para geração de relatório.
+
+Além disso, este artigo detalha como usar as informações de cobertura de código coletadas de uma execução de teste do Coverlet para gerar um relatório. A geração de relatório é possível usando outro projeto de código aberto no GitHub, o ReportGenerator. O ReportGenerator converte os relatórios de cobertura gerados pelo Cobertura, entre vários outros, em relatórios de vários formatos que podem ser lidos por pessoas.
+
+Este artigo é baseado no projeto de código-fonte de exemplo, disponível no navegador de exemplos.
+
+Sistema em teste
+O "sistema em teste" se refere ao código no qual você está escrevendo os testes de unidade, podendo ser um objeto, um serviço ou qualquer outra coisa que exponha a funcionalidade testável. Para este artigo, você criará uma biblioteca de classes que será o sistema em teste e dois projetos de teste de unidade correspondentes.
+
+Criar uma biblioteca de classes
+Em um prompt de comando em um novo diretório chamado UnitTestingCodeCoverage, crie uma biblioteca de classes padrão do .NET usando o comando dotnet new classlib:
+
+CLI do .NET
+
+Copiar
+dotnet new classlib -n Numbers
+O snippet abaixo define uma classe simples PrimeService que tem a funcionalidade de verificar se um número é primo. Copie o snippet abaixo e substitua o conteúdo do arquivo Class1.cs que foi criado automaticamente no diretório Numbers. Renomeie o arquivo Class1.cs como PrimeService.cs.
+
+C#
+
+Copiar
+namespace System.Numbers
+{
+    public class PrimeService
+    {
+        public bool IsPrime(int candidate)
+        {
+            if (candidate < 2)
+            {
+                return false;
+            }
+
+            for (int divisor = 2; divisor <= Math.Sqrt(candidate); ++divisor)
+            {
+                if (candidate % divisor == 0)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
+}
+ Dica
+
+Vale a pena mencionar que a biblioteca de classes Numbers foi adicionada intencionalmente ao namespace System. Isso permite que System.Math fique acessível sem uma declaração de namespace using System;. Para obter mais informações, confira namespace (referência do C#).
+
+Criar projetos de teste
+Crie dois modelos de Projeto de teste xUnit (.NET Core) no mesmo prompt de comando usando o comando dotnet new xunit:
+
+CLI do .NET
+
+Copiar
+dotnet new xunit -n XUnit.Coverlet.Collector
+CLI do .NET
+
+Copiar
+dotnet new xunit -n XUnit.Coverlet.MSBuild
+Nos dois projetos de teste do xUnit recém-criados é necessário adicionar uma referência de projeto da biblioteca de classes Numbers. O motivo é que os projetos de teste tenham acesso ao PrimeService para teste. No prompt de comando, use o comando dotnet add:
+
+CLI do .NET
+
+Copiar
+dotnet add XUnit.Coverlet.Collector\XUnit.Coverlet.Collector.csproj reference Numbers\Numbers.csproj
+CLI do .NET
+
+Copiar
+dotnet add XUnit.Coverlet.MSBuild\XUnit.Coverlet.MSBuild.csproj reference Numbers\Numbers.csproj
+O projeto MSBuild é nomeado adequadamente, pois dependerá do pacote NuGet coverlet.msbuild. Adicione essa dependência de pacote executando o comando dotnet add package:
+
+CLI do .NET
+
+Copiar
+cd XUnit.Coverlet.MSBuild && dotnet add package coverlet.msbuild && cd ..
+O comando anterior fez a mudança de diretório para o escopo do projeto de teste do MSBuild e depois adicionou o pacote NuGet. Quando isso foi feito, houve a mudança de diretório, subindo um nível.
+
+Abra os dois arquivos UnitTest1.cs e substitua o conteúdo deles pelo snippet a seguir. Renomeie os arquivos UnitTest1.cs como PrimeServiceTests.cs.
+
+C#
+
+Copiar
+using System.Numbers;
+using Xunit;
+
+namespace XUnit.Coverlet
+{
+    public class PrimeServiceTests
+    {
+        readonly PrimeService _primeService;
+
+        public PrimeServiceTests() => _primeService = new PrimeService();
+
+        [Theory]
+        [InlineData(-1), InlineData(0), InlineData(1)]
+        public void IsPrime_ValuesLessThan2_ReturnFalse(int value) =>
+            Assert.False(_primeService.IsPrime(value), $"{value} should not be prime");
+
+        [Theory]
+        [InlineData(2), InlineData(3), InlineData(5), InlineData(7)]
+        public void IsPrime_PrimesLessThan10_ReturnTrue(int value) =>
+            Assert.True(_primeService.IsPrime(value), $"{value} should be prime");
+
+        [Theory]
+        [InlineData(4), InlineData(6), InlineData(8), InlineData(9)]
+        public void IsPrime_NonPrimesLessThan10_ReturnFalse(int value) =>
+            Assert.False(_primeService.IsPrime(value), $"{value} should not be prime");
+    }
+}
+Criar uma solução
+No prompt de comando, crie uma solução para encapsular a biblioteca de classes e os dois projetos de teste. Usando o comando dotnet sln:
+
+CLI do .NET
+
+Copiar
+dotnet new sln -n XUnit.Coverage
+Isso criará um nome de arquivo de solução XUnit.Coverage no diretório UnitTestingCodeCoverage. Adicione os projetos à raiz da solução.
+
+Linux
+Windows
+CLI do .NET
+
+Copiar
+dotnet sln XUnit.Coverage.sln add (ls **/*.csproj) --in-root
+Crie a solução usando o comando dotnet build:
+
+CLI do .NET
+
+Copiar
+dotnet build
+Se o build for bem-sucedido, você terá criado os três projetos, referenciado os projetos e pacotes de maneira adequada e atualizado o código-fonte corretamente. Muito bem!
+
+Ferramentas de cobertura de código
+Há dois tipos de ferramentas de cobertura de código:
+
+DataCollectors: os DataCollectors monitoram a execução de teste e coletam informações sobre execuções de teste. Eles relatam as informações coletadas em vários formatos de saída, como XML e JSON. Para saber mais, confira seu primeiro DataCollector.
+Geradores de relatório: use os dados coletados de execuções de teste para gerar relatórios, geralmente no estilo HTML.
+Nesta seção, o foco está nas ferramentas de coletor de dados. Para usar o Coverlet para cobertura de código, um projeto de teste de unidade existente precisa ter as dependências de pacote apropriadas ou, como alternativa, depender de ferramentas globais do .NET e do pacote NuGet coverlet.console correspondente.
+
+Integrar com o teste do .NET
+O modelo de projeto de teste do xUnit já se integra ao coverlet.collector por padrão. No prompt de comando, mude de diretório para o projeto XUnit.Coverlet.Collector e execute o comando dotnet test:
+
+CLI do .NET
+
+Copiar
+cd XUnit.Coverlet.Collector && dotnet test --collect:"XPlat Code Coverage"
+ Observação
+
+O argumento "XPlat Code Coverage" é um nome amigável que corresponde aos coletores de dados do Coverlet. Esse nome é necessário, mas não diferencia maiúsculas de minúsculas.
+
+Durante a execução de dotnet test, um arquivo coverage.cobertura.xml resultante é emitido no diretório TestResults. O arquivo XML contém os resultados. Essa é uma opção multiplataforma que depende da CLI do .NET e é ótima para sistemas de build em que o MSBuild não está disponível.
+
+Veja abaixo o exemplo do arquivo coverage.cobertura.xml.
+
+XML
+
+Copiar
+<?xml version="1.0" encoding="utf-8"?>
+<coverage line-rate="1" branch-rate="1" version="1.9" timestamp="1592248008"
+          lines-covered="12" lines-valid="12" branches-covered="6" branches-valid="6">
+  <sources>
+    <source>C:\</source>
+  </sources>
+  <packages>
+    <package name="Numbers" line-rate="1" branch-rate="1" complexity="6">
+      <classes>
+        <class name="Numbers.PrimeService" line-rate="1" branch-rate="1" complexity="6"
+               filename="Numbers\PrimeService.cs">
+          <methods>
+            <method name="IsPrime" signature="(System.Int32)" line-rate="1"
+                    branch-rate="1" complexity="6">
+              <lines>
+                <line number="8" hits="11" branch="False" />
+                <line number="9" hits="11" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="7" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="10" hits="3" branch="False" />
+                <line number="11" hits="3" branch="False" />
+                <line number="14" hits="22" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="57" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="15" hits="7" branch="False" />
+                <line number="16" hits="7" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="27" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="17" hits="4" branch="False" />
+                <line number="18" hits="4" branch="False" />
+                <line number="20" hits="3" branch="False" />
+                <line number="21" hits="4" branch="False" />
+                <line number="23" hits="11" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="8" hits="11" branch="False" />
+            <line number="9" hits="11" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="7" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="10" hits="3" branch="False" />
+            <line number="11" hits="3" branch="False" />
+            <line number="14" hits="22" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="57" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="15" hits="7" branch="False" />
+            <line number="16" hits="7" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="27" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="17" hits="4" branch="False" />
+            <line number="18" hits="4" branch="False" />
+            <line number="20" hits="3" branch="False" />
+            <line number="21" hits="4" branch="False" />
+            <line number="23" hits="11" branch="False" />
+          </lines>
+        </class>
+      </classes>
+    </package>
+  </packages>
+</coverage>
+ Dica
+
+Como alternativa, você poderá usar o pacote MSBuild se o sistema de build já usar o MSBuild. No prompt de comando, mude de diretório para o projeto XUnit.Coverlet.MSBuild e execute o comando dotnet test:
+
+CLI do .NET
+
+Copiar
+dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura
+O arquivo coverage.cobertura.xml resultante é emitido. Você pode seguir o guia de integração do MSBuild aqui
+
+Gerar relatórios
+Agora que você pode coletar dados de execuções de teste de unidade, gere relatórios usando o ReportGenerator. Para instalar o pacote NuGet ReportGenerator como uma ferramenta global do .NET, use o comando dotnet tool install:
+
+CLI do .NET
+
+Copiar
+dotnet tool install -g dotnet-reportgenerator-globaltool
+Execute a ferramenta e forneça as opções desejadas, considerando o arquivo de saída coverage.cobertura.xml da execução de teste anterior.
+
+Console
+
+Copiar
+reportgenerator
+-reports:"Path\To\TestProject\TestResults\{guid}\coverage.cobertura.xml"
+-targetdir:"coveragereport"
+-reporttypes:Html
+Depois de executar esse comando, um arquivo HTML representa o relatório gerado.
+
+Relatório gerado pelo teste de unidade
+
+Confira também
+Cobertura de código do teste de unidade do Visual Studio
+GitHub – Repositório do Coverlet
+GitHub – Repositório do ReportGenerator
+Site do projeto do ReportGenerator
+Azure: publicar resultados da cobertura de código
+Azure: examinar os resultados da cobertura de código
+Comandos de teste da CLI do .NET
+dotnet-coverage
+Exemplo de código fonte
+Próximas etapas
+
+ Collaborate with us on GitHub
+The source for this content can be found on GitHub, where you can also create and review issues and pull requests. For more information, see our contributor guide.
+
+.NET feedback
+
+The .NET documentation is open source. Provide feedback here.
+
+ Open a documentation issue
+ Provide product feedback
